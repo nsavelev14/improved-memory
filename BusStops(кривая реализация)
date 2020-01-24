@@ -1,0 +1,107 @@
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
+using namespace std;
+
+int main() {
+    
+    map<string, vector<string>> bus;
+    vector<string> busnames;
+    vector<string> busnamessort;
+    string code,bus_name,stop;
+    int q, snumber, count = 0;
+    
+    cin >> q;
+    
+    for (int i = 0; i < q; i++) {
+        
+        cin >> code;
+        
+        if (code == "NEW_BUS") {
+            cin >> bus_name >> snumber;
+            busnames.push_back(bus_name);
+            for (int i = 0; i < snumber; i++) {
+                cin >> stop;
+                bus[bus_name].push_back(stop);
+            }
+        }
+        else {
+            if (code == "BUSES_FOR_STOP") {
+                cin >> stop;
+                for (auto [key,value]: bus) {
+                    for (auto i: value) {
+                        if (i == stop)
+                            busnamessort.push_back(key);
+                    }
+                }
+                
+                if (busnamessort.empty())
+                    cout << "No stop";
+               
+                for (int i = 0; i < busnames.size(); i++) {
+                    for (int j = 0; j < busnamessort.size(); j++) {
+                        if (busnames[i] == busnamessort[j]) {
+                            cout << busnamessort[j] << " ";
+                        }
+                    }
+                }
+                cout << endl;
+                busnamessort.clear();
+            }
+            else {
+                
+                if (code == "STOPS_FOR_BUS") {
+                    
+                    cin >> bus_name;
+                    if (bus.count(bus_name) == 0)
+                        cout << "No bus" << endl;
+                    else {
+                        for (auto c: bus[bus_name]) {
+                            cout << "Stop " << c <<": ";
+                            
+                            for (auto [key1,value1] : bus) {
+                                for (auto k: value1) {
+                                    if (k == c)
+                                    busnamessort.push_back(key1);
+                                }
+                            }
+                            
+                            for (int i = 0; i < busnames.size(); i++) {
+                                for (int j = 0; j < busnamessort.size(); j++) {
+                                    if ((busnames[i] == busnamessort[j]) && (bus_name != busnamessort[j])) {
+                                        cout << busnamessort[j] << " ";
+                                        count++;
+                                    }
+                                }
+                            }
+                            if (count == 0)
+                                cout << "no interchange";
+                            busnamessort.clear();
+                            count = 0;
+                            cout << endl;
+                        }
+                    }
+                    
+                    
+                }
+                else {
+                    if (code == "ALL_BUSES") {
+                        if (bus.empty())
+                            cout << "No buses" << endl;
+                        for (auto [key,value] : bus) {
+                            cout << "Bus " << key << ": ";
+                            for (auto i : value)
+                                cout << i << " ";
+                            cout << endl;
+                        }
+                        
+                    }
+                    else
+                        return 0;
+                }
+            }
+        }
+    }
+    return 0;
+    }
