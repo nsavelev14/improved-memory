@@ -1,0 +1,178 @@
+#include <iostream>
+#include <vector>
+#include <set>
+#include <map>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+class Person {
+public:
+    Person(const string& bname, const string& blname, const int& byear) {
+        data[byear].resize(2);
+        data[byear][0] = bname;
+        data[byear][1] = blname;
+        birth_year = byear;
+    }
+  void ChangeFirstName(int year, const string& first_name) {
+//    // добавить факт изменения имени на first_name в год year
+      if (data[year].size() == 0) {
+          
+          data[year].resize(2, " ");
+          
+      }
+          if (data[year].size() == 1)
+          {
+              data[year].push_back(" ");
+          }
+
+      data[year][0] = first_name;
+  }
+  void ChangeLastName(int year, const string& last_name) {
+//    // добавить факт изменения фамилии на last_name в год year
+      if (data[year].size() == 0) {
+          
+         data[year].resize(2, " ");
+      }
+          if (data[year].size() == 1)
+          {
+              data[year].push_back(" ");
+          }
+
+      data[year][1] = last_name;
+  }
+  string GetFullName(int year) const {
+      if (year < birth_year)
+          return "No person";
+      string ans;
+      vector<string> p(2, " ");
+      //int newyear = year;
+      for (const auto& i: data) {
+          if(i.first <= year) {
+              if (i.second[0] != " ")
+                  p[0] = i.second[0];
+              if (i.second[1] != " ")
+                  p[1] = i.second[1];
+          }
+          else
+              break;
+      }
+
+      if ((p[0] == " ")&&(p[1] == " ")) {
+          ans = "Incognito";
+      }
+      else {
+      if ((p[0] == " ")&&(p[1] != " ")) {
+          ans = p[1] + " with unknown first name";
+      }
+      else {
+      if ((p[0] != " ")&&(p[1] == " ")) {
+          ans = p[0] +" with unknown last name";
+      }
+      else {
+      ans = p[0] + " " + p[1];
+          
+      }
+      }
+      }
+      return ans;
+  }
+    string GetFullNameWithHistory (int year) const {
+        
+        if (year < birth_year)
+        return "No person";
+        
+        string ans;
+        vector<string> p(2, " ");
+        vector<string> name;
+        vector<string> lastname;
+        //int newyear = year;
+        for (auto i: data) {
+            if(i.first <= year) {
+                if (i.second[0] != " ") {
+                    p[0] = i.second[0];
+                    name.insert(name.begin(), i.second[0]);
+                }
+                if (i.second[1] != " ") {
+                    p[1] = i.second[1];
+                    lastname.insert(lastname.begin(), i.second[1]);
+                }
+            }
+            else
+                break;
+        }
+        
+        if (name.size() > 1) {
+            string tmp;
+            tmp = p[0];
+            p[0] += " (";
+        for (const auto& i : name) {
+            if (p[0] != (i+ " (")) {
+                p[0] =p[0] + i + ", ";
+            
+            }
+        }
+            p[0].pop_back();
+            p[0].pop_back();
+            if (p[0] != tmp)
+            p[0] += ")";
+        }
+        
+        if (lastname.size() > 1) {
+            string tmp;
+            tmp = p[1];
+            p[1] += " (";
+            
+        for (const auto& i : lastname) {
+            if (p[1] != (i+ " (")) {
+                p[1] =p[1] + i + ", ";
+            
+            }
+        }
+            p[1].pop_back();
+            p[1].pop_back();
+            if (p[1] != tmp)
+            p[1] += ")";
+        }
+        
+        if ((p[0] == " ")&&(p[1] == " ")) {
+            ans = "Incognito";
+        }
+        else {
+        if ((p[0] == " ")&&(p[1] != " ")) {
+            ans = p[1] + " with unknown first name";
+        }
+        else {
+        if ((p[0] != " ")&&(p[1] == " ")) {
+            ans = p[0] +" with unknown last name";
+        }
+        else {
+        ans = p[0] + " " + p[1];
+            
+        }
+        }
+        }
+        return ans;
+        
+    }
+    
+private:
+    map<int , vector<string>> data;
+    int birth_year;
+};
+
+int main() {
+  Person person("Polina", "Sergeeva", 1960);
+  for (int year : {1959, 1960}) {
+    cout << person.GetFullNameWithHistory(year) << endl;
+  }
+  
+  person.ChangeFirstName(1965, "Appolinaria");
+  person.ChangeLastName(1967, "Ivanova");
+  for (int year : {1965, 1967}) {
+    cout << person.GetFullNameWithHistory(year) << endl;
+  }
+
+  return 0;
+}
