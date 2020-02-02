@@ -165,3 +165,37 @@ bool operator< (const Rational& lhs, const Rational& rhs) {
         }
     }
 }
+
+
+int main() {
+    char operation;
+    Rational a,b;
+    try{
+    cin >> a >> operation >> b;
+    
+    
+    if (operation == '+') {
+        cout << a + b << endl;
+    } else {
+        if (operation == '-') {
+            cout << a - b << endl;
+        } else {
+            if (operation == '*') {
+                cout << a * b << endl;
+            } else {
+                if (operation == '/') {
+                    try {
+                        cout << a / b << endl;
+                    } catch (domain_error& ex) {
+                        cout << ex.what() << endl;
+                    }
+                }
+            }
+        }
+      }
+    } catch (invalid_argument& ex) {
+        cout << ex.what() << endl;
+    }
+    
+    return 0;
+}
