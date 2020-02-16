@@ -1,0 +1,210 @@
+#include <iostream>
+#include <set>
+#include <map>
+#include <exception>
+#include <sstream>
+#include <iomanip>
+using namespace std;
+
+// Реализуйте функции и методы классов и при необходимости добавьте свои
+void PrintSet(const set<string>& s) {
+    for (auto i: s)
+        cout << i << endl;
+}
+class Date {
+public:
+    Date() {}
+    Date(int y, int m ,int d ) {
+        if (m > 12 || m < 1) {
+            string s = "Month value is invalid: " + to_string(m);
+            throw invalid_argument(s);
+        }
+        
+        if (d > 31 || d < 1) {
+            string s = "Day value is invalid: " + to_string(d);
+                       throw invalid_argument(s);
+        }
+        year = y;
+        month = m;
+        day = d;
+    }
+    int GetYear() const {
+        return year;
+    };
+    int GetMonth() const {
+        return month;
+    };
+    int GetDay() const {
+        return day;
+    };
+private:
+    int day;
+    int month;
+    int year;
+};
+
+ostream& operator <<(ostream& stream, const Date& date) {
+    stream << setfill('0') << setw(4) << date.GetYear() <<
+     '-' << setw(2) << date.GetMonth()<< '-' << setw(2) <<
+    date.GetDay();
+    return stream;
+}
+
+bool operator<(const Date& lhs, const Date& rhs) {
+    if (lhs.GetYear() == rhs.GetYear()) {
+        
+        if (lhs.GetMonth() == rhs.GetMonth()) {
+            return lhs.GetDay() < rhs.GetDay();
+        } else {
+            return lhs.GetMonth() < rhs.GetMonth();
+        }
+    } else {
+        return lhs.GetYear() < rhs.GetYear();
+    }
+}
+
+class Database {
+public:
+    void AddEvent(const Date& date, const string& event) {
+        data[date].insert(event);
+    };
+    bool DeleteEvent(const Date& date, const string& event) {
+        if (data.find(date) == data.end())
+            return false;
+        if (data.count(date) > 0) {
+        if(!data.at(date).empty() && data.at(date).count(event) > 0)  {
+            data.at(date).erase(event);
+            return true;
+        } else {
+            return false;
+        }
+        } else
+            return false;
+    };
+    int  DeleteDate(const Date& date) {
+        if (!data.count(date)) {
+            return 0;
+        } else {
+            int tmp = data.at(date).size();
+            data.erase(date);
+            return tmp;
+        }
+    };
+
+    void Find(const Date& date) const {
+        if (data.count(date) > 0)
+            PrintSet(data.at(date));
+    };
+  
+    void Print() const {
+        for (auto i: data) {
+            for (auto j: i.second) {
+                cout << i.first << " " << j << endl;
+                
+            }
+           
+        }
+    };
+private:
+    map<Date, set<string>> data;
+};
+
+Date ParseDate(const string& s) {
+    stringstream ss(s);
+    
+    int y,d,m;
+    char del1, del2;
+    
+    ss >> y >> del1 >> m >> del2 >> d;
+    
+    if (ss.fail() == true || del1 != '-' || del2 != '-' || ss.peek() != EOF) {
+        string line = "Wrong date format: " + s;
+        throw invalid_argument(line);
+    }
+    return Date(y,m,d);
+}
+
+int main() {
+    
+    
+    
+    string s,event, c;
+    Date date;
+    Database db;
+    try {
+
+    string command;
+    while (getline(cin, command)) {
+
+        if (command == "") {
+            continue;
+        }
+        stringstream cmd(command);
+
+        cmd >> c;
+     if (c == "Add") {
+
+         cmd >> s;
+         date = ParseDate(s);
+         cmd >> event;
+
+         db.AddEvent(date, event);
+
+     } else {
+         if (c == "Del") {
+
+             cmd >> s;
+             date = ParseDate(s);
+
+
+             if (cmd.peek() == ' ') {
+                 cmd >> event;
+                 
+                 //cout << event<< endl;
+
+             if (db.DeleteEvent(date, event)) {
+                cout << "Deleted successfully" << endl;
+
+             } else {
+                cout << "Event not found" << endl;
+
+             }
+             } else {
+                 cout << "Deleted " << db.DeleteDate(date) << " events" << endl;
+             }
+
+
+
+         } else {
+             if (c == "Find") {
+                 cmd >> s;
+                 date = ParseDate(s);
+
+                 db.Find(date);
+
+             } else {
+                 if (c == "Print") {
+                     db.Print();
+
+                 } else {
+                     string s = "Unknown command: " + command;
+                     throw invalid_argument(s);
+                 }
+             }
+         }
+     }
+        if(cmd.peek() == '\n')
+            cmd.ignore(1);
+        s.clear();
+        c.clear();
+}
+    } catch(invalid_argument& ex) {
+        cout << ex.what() << endl;
+    }catch(out_of_range) {
+
+    }
+
+    return 0;
+}
+
+
