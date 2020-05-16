@@ -1,0 +1,120 @@
+#include <iostream>
+#include <string>
+#include <memory>
+#include <cmath>
+#include <vector>
+#include <sstream>
+#include <iomanip>
+using namespace std;
+
+class Figure {
+public:
+    virtual string Name() const = 0;
+    virtual double Perimeter() const = 0;
+    virtual double Area() const = 0;
+};
+
+class Triangle : public Figure {
+public:
+    Triangle(const double& a, const double& b, const double& c) : length_1(a), length_2(b), length_3(c) {}
+    
+    string Name() const override {
+        return name;
+    }
+    
+    double Perimeter() const override {
+        return length_1 + length_2 + length_3;
+    }
+    
+    double Area() const override {
+        double p = Perimeter() / 2;
+        return sqrt(p*(p-length_1)*(p-length_2)*(p-length_3));
+    }
+private:
+    const string name = "TRIANGLE";
+    const double length_1;
+    const double length_2;
+    const double length_3;
+};
+
+class Rect : public Figure {
+public:
+    Rect(const double& a, const double& b) : length_1(a), length_2(b) {}
+    
+    string Name() const override {
+        return name;
+    }
+    
+    double Perimeter() const override {
+        return 2 * (length_1 + length_2);
+    }
+    
+    double Area() const override {
+        return length_1 * length_2;
+    }
+private:
+    const string name = "RECT";
+    const double length_1;
+    const double length_2;
+};
+
+class Circle : public Figure {
+public:
+    Circle(const double& radius) : _radius(radius) {}
+    
+    string Name() const override {
+        return name;
+    }
+    
+    double Perimeter() const override {
+        return 2 * 3.14 * _radius;
+    }
+    
+    double Area() const override {
+        return 3.14 * _radius * _radius;
+    }
+private:
+    const string name = "CIRCLE";
+    const double _radius;
+    
+};
+
+shared_ptr<Figure> CreateFigure (istringstream& is) {
+    string name;
+    is >> name;
+    if (name == "TRIANGLE") {
+        double a,b,c;
+        is >> a >> b >> c;
+        return make_shared<Triangle>(a, b, c);
+    } else if (name == "RECT") {
+        double a,b;
+        is >> a >> b;
+        return make_shared<Rect>(a,b);
+    } else if (name == "CIRCLE") {
+        double radius;
+        is >> radius;
+        return make_shared<Circle>(radius);
+    }
+    return make_shared<Circle>(0);
+}
+
+int main() {
+  vector<shared_ptr<Figure>> figures;
+  for (string line; getline(cin, line); ) {
+    istringstream is(line);
+
+    string command;
+    is >> command;
+    if (command == "ADD") {
+      figures.push_back(CreateFigure(is));
+    } else if (command == "PRINT") {
+      for (const auto& current_figure : figures) {
+        cout << fixed << setprecision(3)
+             << current_figure->Name() << " "
+             << current_figure->Perimeter() << " "
+             << current_figure->Area() << endl;
+      }
+    }
+  }
+  return 0;
+}
